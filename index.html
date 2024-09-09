@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#007bff">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Binary Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #171717;
+        }
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            max-width: 350px;
+            width: 100%;
+        }
+        .banner img {
+            width: 100%;
+            max-height: 150px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .number-display {
+            font-size: 2.5rem;
+            margin: 20px 0;
+            letter-spacing: 4px;
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 8px;
+            color: #333;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #171717;
+            cursor: not-allowed;
+        }
+    </style>
+
+    
+</head>
+<body>
+
+    <div class="container">
+        <!-- Banner Section -->
+        <div class="banner">
+            <!-- Replace the src link with your banner image -->
+            <img src="https://t3.ftcdn.net/jpg/06/56/57/60/360_F_656576099_9lT1LGtCi78orv7P62Ro1JH8lNj9YSsU.jpg" alt="Banner">
+        </div>
+        <!-- Random Binary Number Display -->
+        <div id="numberDisplay" class="number-display">00000000</div>
+        <button id="nextNumberBtn">Next Number</button>
+        <button id="restartBtn" onclick="restartSession()">Restart Session</button>
+        <p id="message" style="color:red; font-size: 14px;"></p>
+    </div>
+
+    <script>
+        const totalCombinations = 256;
+        let generatedNumbers = new Set();
+
+        function generateRandomBinary() {
+            let binary = "";
+            for (let i = 0; i < 8; i++) {
+                binary += Math.floor(Math.random() * 2);
+            }
+            return binary;
+        }
+
+        function generateNumber() {
+            if (generatedNumbers.size >= totalCombinations) {
+                document.getElementById('message').textContent = "All 256 combinations generated.";
+                document.getElementById('nextNumberBtn').disabled = true;
+                return;
+            }
+
+            let newNumber;
+            do {
+                newNumber = generateRandomBinary();
+            } while (generatedNumbers.has(newNumber));
+
+            generatedNumbers.add(newNumber);
+            document.getElementById('numberDisplay').textContent = newNumber;
+        }
+
+        function restartSession() {
+            generatedNumbers.clear();
+            document.getElementById('message').textContent = "";
+            document.getElementById('numberDisplay').textContent = "00000000";
+            document.getElementById('nextNumberBtn').disabled = false;
+        }
+
+        document.getElementById('nextNumberBtn').addEventListener('click', generateNumber);
+
+
+        if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+      console.log('Service Worker registered with scope:', registration.scope);
+    }).catch(function(error) {
+      console.log('Service Worker registration failed:', error);
+    });
+  }
+
+    </script>
+
+</body>
+</html>
