@@ -1,131 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#007bff">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Binary Game</title>
+    <title>Random Binary Game Assistant</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background-color: #171717;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
         }
-        .container {
+
+        .app-container {
             text-align: center;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            max-width: 350px;
-            width: 100%;
+            max-width: 300px;
         }
-        .banner img {
-            width: 100%;
-            max-height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
-            border-radius: 10px;
-        }
+
         .number-display {
-            font-size: 2.5rem;
-            margin: 20px 0;
-            letter-spacing: 4px;
-            background-color: #f1f1f1;
-            padding: 10px;
-            border-radius: 8px;
-            color: #333;
+            font-size: 4em;
+            margin-bottom: 20px;
         }
-        button {
-            background-color: #007bff;
+
+        .btn {
+            background-color: #0a0;
             color: white;
             border: none;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            width: 100%;
-            font-size: 16px;
+            border-radius: 100%;
+            width: 100px;
+            height: 100px;
+            font-size: 1.2em;
+            margin: 20px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            outline: none;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .btn:disabled {
+            background-color: #555;
         }
-        button:disabled {
-            background-color: #171717;
-            cursor: not-allowed;
+
+        .btn-restart {
+            background-color: #f00;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            .number-display {
+                font-size: 2.5em;
+            }
+
+            .btn {
+                width: 80px;
+                height: 80px;
+                font-size: 1em;
+            }
         }
     </style>
-
-    
 </head>
 <body>
-
-    <div class="container">
-        <!-- Banner Section -->
-        <div class="banner">
-            <!-- Replace the src link with your banner image -->
-            <img src="https://t3.ftcdn.net/jpg/06/56/57/60/360_F_656576099_9lT1LGtCi78orv7P62Ro1JH8lNj9YSsU.jpg" alt="Banner">
+    <div class="app-container">
+        <div class="number-display" id="numberDisplay">--:--</div>
+        <div class="container">
+            <button class="btn" id="startButton" onclick="startSession()">Start</button>
+            <button class="btn btn-restart" id="restartButton" onclick="restartSession()" disabled>Restart</button>
         </div>
-        <!-- Random Binary Number Display -->
-        <div id="numberDisplay" class="number-display">00000000</div>
-        <button id="nextNumberBtn">Next Number</button>
-        <button id="restartBtn" onclick="restartSession()">Restart Session</button>
-        <p id="message" style="color:red; font-size: 14px;"></p>
     </div>
 
     <script>
+        let usedCombinations = new Set();
+        let sessionActive = false;
         const totalCombinations = 256;
-        let generatedNumbers = new Set();
 
         function generateRandomBinary() {
-            let binary = "";
-            for (let i = 0; i < 8; i++) {
-                binary += Math.floor(Math.random() * 2);
-            }
-            return binary;
+            let binaryNumber;
+            do {
+                binaryNumber = Math.floor(Math.random() * 256).toString(2).padStart(8, '0');
+            } while (usedCombinations.has(binaryNumber) && usedCombinations.size < totalCombinations);
+            usedCombinations.add(binaryNumber);
+            return binaryNumber;
         }
 
-        function generateNumber() {
-            if (generatedNumbers.size >= totalCombinations) {
-                document.getElementById('message').textContent = "All 256 combinations generated.";
-                document.getElementById('nextNumberBtn').disabled = true;
-                return;
-            }
+        function startSession() {
+            if (sessionActive) return;
 
-            let newNumber;
-            do {
-                newNumber = generateRandomBinary();
-            } while (generatedNumbers.has(newNumber));
-
-            generatedNumbers.add(newNumber);
-            document.getElementById('numberDisplay').textContent = newNumber;
+            sessionActive = true;
+            usedCombinations.clear();
+            document.getElementById('numberDisplay').innerHTML = generateRandomBinary();
+            document.getElementById('startButton').innerText = "Next";
+            document.getElementById('restartButton').disabled = false;
         }
 
         function restartSession() {
-            generatedNumbers.clear();
-            document.getElementById('message').textContent = "";
-            document.getElementById('numberDisplay').textContent = "00000000";
-            document.getElementById('nextNumberBtn').disabled = false;
+            sessionActive = false;
+            usedCombinations.clear();
+            document.getElementById('numberDisplay').innerHTML = "--:--";
+            document.getElementById('startButton').innerText = "Start";
+            document.getElementById('restartButton').disabled = true;
         }
 
-        document.getElementById('nextNumberBtn').addEventListener('click', generateNumber);
-
-
-        if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-      console.log('Service Worker registered with scope:', registration.scope);
-    }).catch(function(error) {
-      console.log('Service Worker registration failed:', error);
-    });
-  }
-
+        document.getElementById('startButton').addEventListener('click', function() {
+            if (sessionActive && usedCombinations.size < totalCombinations) {
+                document.getElementById('numberDisplay').innerHTML = generateRandomBinary();
+            } else if (usedCombinations.size >= totalCombinations) {
+                document.getElementById('numberDisplay').innerHTML = "Session Over";
+                sessionActive = false;
+                document.getElementById('startButton').disabled = true;
+            }
+        });
     </script>
-
 </body>
 </html>
