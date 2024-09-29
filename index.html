@@ -19,7 +19,7 @@
 
         .app-container {
             text-align: center;
-            max-width: 300px;
+            max-width: 1080px;
         }
 
         .number-display {
@@ -35,7 +35,7 @@
             width: 100px;
             height: 100px;
             font-size: 1.2em;
-            margin: 20px;
+            margin: 80px;
             cursor: pointer;
             outline: none;
         }
@@ -53,9 +53,9 @@
             justify-content: center;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 1080px) {
             .number-display {
-                font-size: 2.5em;
+                font-size: 3.5em;
             }
 
             .btn {
@@ -70,8 +70,9 @@
     <div class="app-container">
         <div class="number-display" id="numberDisplay">--:--</div>
         <div class="container">
-            <button class="btn" id="startButton" onclick="startSession()">Start</button>
             <button class="btn btn-restart" id="restartButton" onclick="restartSession()" disabled>Restart</button>
+            <button class="btn" id="startButton" onclick="startSession()">Start</button>
+            
         </div>
     </div>
 
