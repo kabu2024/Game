@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Binary Game Assistant</title>
+    <title>Random Binary Number Generator</title>
     <style>
         body {
             margin: 0;
@@ -25,7 +25,7 @@
 
         .number-display {
             font-size: 4em;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .btn {
@@ -56,8 +56,9 @@
         }
 
         .toggle-button {
-            margin-top: 20px;
-            width: 200px;
+            margin-top: 5px;
+            margin-bottom: 100px;
+            width: 120px;
             height: 50px;
             border-radius: 25px;
             background: linear-gradient(90deg, #ff5f6d, #ffc371);
@@ -76,25 +77,6 @@
             font-size: 1.2em;
             color: white;
             font-weight: bold;
-        }
-
-        .toggle-button:before {
-            content: '';
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-image: url('https://image.shutterstock.com/image-vector/sun-icon-260nw-1565552584.jpg'); /* Example sun image */
-            background-size: cover;
-            background-position: center;
-        }
-
-        .toggle-button.hard-mode:before {
-            background-image: url('https://image.shutterstock.com/image-vector/moon-icon-260nw-1565552585.jpg'); /* Example moon image */
         }
 
         @media (max-width: 1080px) {
@@ -129,32 +111,24 @@
     <script>
         let usedCombinations = new Set();
         let sessionActive = false;
-        let currentMode = 1;  // 1 for Simple, 2 for Hard
-        const mode1Combinations = 256;
-        const mode2Combinations = 64;
+        let currentMode = 1;  // 1 for Simple (6 digits), 2 for Hard (8 digits)
+        const mode1Combinations = 64;  // 6-bit numbers
+        const mode2Combinations = 256; // 8-bit numbers
 
         function toggleMode() {
             currentMode = currentMode === 1 ? 2 : 1;
 
-            // Update the button text and icon based on the current mode
-            const toggleButton = document.getElementById('toggleModeButton');
+            // Update the button text based on the current mode
             const toggleText = document.getElementById('toggleModeText');
-            
-            if (currentMode === 1) {
-                toggleText.innerText = "Simple";
-                toggleButton.classList.remove('hard-mode');
-            } else {
-                toggleText.innerText = "Hard";
-                toggleButton.classList.add('hard-mode');
-            }
+            toggleText.innerText = currentMode === 1 ? "Simple" : "Hard";
 
             // Reset the session when the mode is changed
             restartSession();
         }
 
         function generateRandomBinary() {
-            let maxNumber = currentMode === 1 ? mode1Combinations : mode2Combinations;
-            let binaryLength = currentMode === 1 ? 8 : 6;
+            const maxNumber = currentMode === 1 ? mode1Combinations : mode2Combinations;
+            const binaryLength = currentMode === 1 ? 6 : 8;
             let binaryNumber;
             do {
                 binaryNumber = Math.floor(Math.random() * maxNumber).toString(2).padStart(binaryLength, '0');
@@ -182,13 +156,13 @@
         }
 
         document.getElementById('startButton').addEventListener('click', function() {
-            let maxCombinations = currentMode === 1 ? mode1Combinations : mode2Combinations;
+            const maxCombinations = currentMode === 1 ? mode1Combinations : mode2Combinations;
             if (sessionActive && usedCombinations.size < maxCombinations) {
                 document.getElementById('numberDisplay').innerHTML = generateRandomBinary();
             } else if (usedCombinations.size >= maxCombinations) {
                 document.getElementById('numberDisplay').innerHTML = "Session Over";
                 sessionActive = false;
-                document.getElementById('startButton').disabled = true;
+                document.getElementById('startButton').disabled = false;
             }
         });
     </script>
